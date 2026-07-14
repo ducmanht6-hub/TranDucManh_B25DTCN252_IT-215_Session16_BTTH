@@ -1,43 +1,59 @@
-from database import Base
-from sqlalchemy import Column,String,Integer,ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship, declarative_base
+
+Base = declarative_base()
 
 
-class DepartmentModel(Base):
-    __tablename__ ='departments'
+class Fleet(Base):
+    __tablename__ = "fleets"
 
-    id = Column(Integer,primary_key= True)
-    name = Column(String(50),nullable= False)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
 
-    students= relationship('StudentModel', back_populates='department')
-
-class StudentModel(Base):
-    __tablename__='students'
-
-    id=Column(Integer,primary_key=True)
-    full_name = Column(String(50),nullable= False)
-    status= Column(String(50),default='ACTIVE',nullable= False)
-    department_id= Column(Integer,ForeignKey('departments.id'),nullable=False)
-
-    department = relationship('DepartmentModel',back_populates='students')
-    enrollments = relationship('EnrollmentModel',back_populates='student')
-
-class CourseModel(Base):
-    __tablename__ ='courses'
-
-    id = Column(Integer,primary_key=True)
-    name= Column(String(50),nullable= False)
-    status= Column(String(50),default='OPEN',nullable=False)
-
-    enrollments = relationship('EnrollmentModel',back_populates='course')
+    drivers = relationship("Driver", back_populates="fleet")
 
 
-class EnrollmentModel(Base):
-    __tablename__ ='enrollments'
+class Driver(Base):
+    __tablename__ = "drivers"
 
-    id= Column(Integer,primary_key=True)
-    student_id = Column(Integer,ForeignKey('students.id'),nullable=False)
-    course_id = Column(Integer,ForeignKey('courses.id'),nullable=False)
+    id = Column(Integer, primary_key=True)
+    full_name = Column(String(100), nullable=False)
+    status = Column(String(20))
+    fleet_id = Column(Integer, ForeignKey("fleets.id"))
 
-    student= relationship('StudentModel',back_populates='enrollments')
-    course=relationship('CourseModel',back_populates='enrollments')
+    fleet = relationship("Fleet", back_populates="drivers")
+
+    bookings = relationship("Booking", back_populates="driver")
+
+    cars = relationship(
+        "Car",
+        secondary="bookings",
+        back_populates="drivers"
+    )
+
+
+class Car(Base):
+    __tablename__ = "cars"
+
+    id = Column(Integer, primary_key=True)
+    license_plate = Column(String(20), nullable=False)
+    status = Column(String(20))
+
+    bookings = relationship("Booking", back_populates="car")
+
+    drivers = relationship(
+        "Driver",
+        secondary="bookings",
+        back_populates="cars"
+    )
+
+
+class Booking(Base):
+    __tablename__ = "bookings"
+
+    id = Column(Integer, primary_key=True)
+    driver_id = Column(Integer, ForeignKey("drivers.id"))
+    car_id = Column(Integer, ForeignKey("cars.id"))
+
+    driver = relationship("Driver", back_populates="bookings")
+    car = relationship("Car", back_populates="bookings")
