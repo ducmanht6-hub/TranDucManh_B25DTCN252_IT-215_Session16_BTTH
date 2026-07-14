@@ -15,8 +15,6 @@ app = FastAPI(title="Ride Booking API")
 def home():
     return {"message": "Ride Booking API is running"}
 
-
-# Fleet
 @app.post("/fleets", response_model=schema.FleetResponse)
 def create_fleet(fleet: schema.FleetCreate, db: Session = Depends(get_db)):
     return service.create_fleet(db, fleet)
@@ -26,8 +24,6 @@ def create_fleet(fleet: schema.FleetCreate, db: Session = Depends(get_db)):
 def get_fleets(db: Session = Depends(get_db)):
     return service.get_all_fleets(db)
 
-
-# Driver
 @app.post("/drivers", response_model=schema.DriverResponse)
 def create_driver(driver: schema.DriverCreate, db: Session = Depends(get_db)):
     return service.create_driver(db, driver)
@@ -37,8 +33,6 @@ def create_driver(driver: schema.DriverCreate, db: Session = Depends(get_db)):
 def get_drivers(db: Session = Depends(get_db)):
     return service.get_all_drivers(db)
 
-
-# Car
 @app.post("/cars", response_model=schema.CarResponse)
 def create_car(car: schema.CarCreate, db: Session = Depends(get_db)):
     return service.create_car(db, car)
@@ -48,8 +42,6 @@ def create_car(car: schema.CarCreate, db: Session = Depends(get_db)):
 def get_cars(db: Session = Depends(get_db)):
     return service.get_all_cars(db)
 
-
-# Booking
 @app.post("/bookings", response_model=schema.BookingResponse)
 def create_booking(booking: schema.BookingCreate, db: Session = Depends(get_db)):
     return service.create_booking(db, booking)
