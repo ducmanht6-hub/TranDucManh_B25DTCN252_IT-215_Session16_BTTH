@@ -1,43 +1,60 @@
-      
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from database import *
-from model import *
-from schema import *
-from service import *
 
-app = FastAPI()
+from database import engine, get_db
+from model import Base
+import schema
+import service
 
 Base.metadata.create_all(bind=engine)
 
-
-@app.get('/students/{student_id}', response_model=StudentResponse, status_code=status.HTTP_200_OK)
-def get_student(student_id: int, db: Session = Depends(get_db)):
-    student = get_detail_student(student_id, db)
-    if student == 1:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='k tim thay id'
-        )
-    
-    return student
+app = FastAPI(title="Ride Booking API")
 
 
-@app.post("/enrollments", response_model=EnrollmentResponse, status_code=status.HTTP_201_CREATED)
-def dky_sv(data: EnrollmentCreate, db: Session = Depends(get_db)):
-    check = register_student(data, db)
-    if check == 'student_not_found':
-        raise HTTPException(
-            status_code=404,
-            detail='k tim thay hco sinh'
-        )
-    
-    if check == 'status not is ACTIVE':
-        raise HTTPException(status_code=400, detail='status must is active')
-    if check == 'course not found':
-        raise HTTPException(status_code=404, detail='k tim thay khoa hoc')
-    if check == 'status not open':
-        raise HTTPException(status_code=400, detail='status must is open')
-    if check == 'duplicate register':
-        raise HTTPException(status_code=409, detail='hoc vien da dky khoa hoc')
-    return check
+@app.get("/")
+def home():
+    return {"message": "Ride Booking API is running"}
+
+
+# Fleet
+@app.post("/fleets", response_model=schema.FleetResponse)
+def create_fleet(fleet: schema.FleetCreate, db: Session = Depends(get_db)):
+    return service.create_fleet(db, fleet)
+
+
+@app.get("/fleets", response_model=list[schema.FleetResponse])
+def get_fleets(db: Session = Depends(get_db)):
+    return service.get_all_fleets(db)
+
+
+# Driver
+@app.post("/drivers", response_model=schema.DriverResponse)
+def create_driver(driver: schema.DriverCreate, db: Session = Depends(get_db)):
+    return service.create_driver(db, driver)
+
+
+@app.get("/drivers", response_model=list[schema.DriverResponse])
+def get_drivers(db: Session = Depends(get_db)):
+    return service.get_all_drivers(db)
+
+
+# Car
+@app.post("/cars", response_model=schema.CarResponse)
+def create_car(car: schema.CarCreate, db: Session = Depends(get_db)):
+    return service.create_car(db, car)
+
+
+@app.get("/cars", response_model=list[schema.CarResponse])
+def get_cars(db: Session = Depends(get_db)):
+    return service.get_all_cars(db)
+
+
+# Booking
+@app.post("/bookings", response_model=schema.BookingResponse)
+def create_booking(booking: schema.BookingCreate, db: Session = Depends(get_db)):
+    return service.create_booking(db, booking)
+
+
+@app.get("/bookings", response_model=list[schema.BookingResponse])
+def get_bookings(db: Session = Depends(get_db)):
+    return service.get_all_bookings(db)
