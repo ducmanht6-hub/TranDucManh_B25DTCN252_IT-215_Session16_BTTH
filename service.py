@@ -1,56 +1,46 @@
-      
-from model import *
-from schema import *
 from sqlalchemy.orm import Session
+import model
+import schema
 
-
-def get_detail_student(student_id: int, db: Session):
-    student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
-    if student is None:
-        return 1
-    
-    lst_course = [
-        i.course for i in student.enrollments
-    ]
-    return {
-        'student_id': student.id,
-        'full_name': student.full_name,
-        'status': student.status,
-        'department': student.department,
-        'enrollments': lst_course
-    }
-
-
-def register_student(data: EnrollmentCreate, db: Session):
-    student = db.query(StudentModel).filter(StudentModel.id == data.student_id).first()
-    if student is None:
-        return 'student_not_found'
-    
-    if student.status != 'ACTIVE':
-        return 'status not is ACTIVE'
-    
-    course = db.query(CourseModel).filter(CourseModel.id == data.course_id).first()
-    if course is None:
-        return 'course not found'
-    
-    if course.status != 'OPEN':
-        return 'status not open'
-    
-    is_duplicate = db.query(EnrollmentModel).filter(
-        EnrollmentModel.course_id == data.course_id,
-        EnrollmentModel.student_id == data.student_id
-    ).first()
-
-    if is_duplicate is not None:
-        return 'duplicate register'
-    
-    new_enrollment = EnrollmentModel(
-        course_id = data.course_id,
-        student_id = data.student_id
-    )
-
-    db.add(new_enrollment)
+def create_fleet(db: Session, fleet: schema.FleetCreate):
+    new_fleet = model.Fleet(**fleet.model_dump())
+    db.add(new_fleet)
     db.commit()
-    db.refresh(new_enrollment)
+    db.refresh(new_fleet)
+    return new_fleet
 
-    return new_enrollment
+
+def get_all_fleets(db: Session):
+    return db.query(model.Fleet).all()
+
+def create_driver(db: Session, driver: schema.DriverCreate):
+    new_driver = model.Driver(**driver.model_dump())
+    db.add(new_driver)
+    db.commit()
+    db.refresh(new_driver)
+    return new_driver
+
+
+def get_all_drivers(db: Session):
+    return db.query(model.Driver).all()
+
+def create_car(db: Session, car: schema.CarCreate):
+    new_car = model.Car(**car.model_dump())
+    db.add(new_car)
+    db.commit()
+    db.refresh(new_car)
+    return new_car
+
+
+def get_all_cars(db: Session):
+    return db.query(model.Car).all()
+
+def create_booking(db: Session, booking: schema.BookingCreate):
+    new_booking = model.Booking(**booking.model_dump())
+    db.add(new_booking)
+    db.commit()
+    db.refresh(new_booking)
+    return new_booking
+
+def get_all_bookings(db: Session):
+    return db.query(model.Booking).all()
