@@ -1,10 +1,7 @@
 from pydantic import BaseModel
 
-
-# Fleet
 class FleetCreate(BaseModel):
     name: str
-
 
 class FleetResponse(FleetCreate):
     id: int
@@ -12,8 +9,6 @@ class FleetResponse(FleetCreate):
     class Config:
         from_attributes = True
 
-
-# Driver
 class DriverCreate(BaseModel):
     full_name: str
     status: str
@@ -26,8 +21,6 @@ class DriverResponse(DriverCreate):
     class Config:
         from_attributes = True
 
-
-# Car
 class CarCreate(BaseModel):
     license_plate: str
     status: str
@@ -39,8 +32,6 @@ class CarResponse(CarCreate):
     class Config:
         from_attributes = True
 
-
-# Booking
 class BookingCreate(BaseModel):
     driver_id: int
     car_id: int
