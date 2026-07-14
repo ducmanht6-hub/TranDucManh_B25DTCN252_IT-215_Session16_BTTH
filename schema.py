@@ -1,36 +1,53 @@
 from pydantic import BaseModel
 
 
-class EnrollmentCreate(BaseModel):
-    student_id: int
-    course_id: int
-
-class DepartmentCreate(BaseModel):
-    id: int
+# Fleet
+class FleetCreate(BaseModel):
     name: str
-    class Config:
-        from_attributes = True
 
-class CourseResponse(BaseModel):
+
+class FleetResponse(FleetCreate):
     id: int
-    name: str
-    status: str
+
     class Config:
         from_attributes = True
 
 
-class StudentResponse(BaseModel):
-    student_id: int
+# Driver
+class DriverCreate(BaseModel):
     full_name: str
     status: str
-    department: DepartmentCreate
-    enrollments: list[CourseResponse]
+    fleet_id: int
+
+
+class DriverResponse(DriverCreate):
+    id: int
+
     class Config:
         from_attributes = True
 
-class EnrollmentResponse(BaseModel):
+
+# Car
+class CarCreate(BaseModel):
+    license_plate: str
+    status: str
+
+
+class CarResponse(CarCreate):
     id: int
-    student_id: int
-    course_id: int
+
+    class Config:
+        from_attributes = True
+
+
+# Booking
+class BookingCreate(BaseModel):
+    driver_id: int
+    car_id: int
+
+
+class BookingResponse(BookingCreate):
+    id: int
+
     class Config:
         from_attributes = True
